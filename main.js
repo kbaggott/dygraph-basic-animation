@@ -32,7 +32,7 @@ var g = new Dygraph(document.getElementById('graph'),
 		}
 );
 
-function animate(data, dygraph){
+function animate(d, dygraph){
 	// SETUP
 	var steps = 40; //no of increments
 	var fps = false; //fps: auto if false.
@@ -46,41 +46,40 @@ function animate(data, dygraph){
 	// this seems a nice speed.
 	if (!fps) fps = steps * 2.5;
 	var first = true;
-	var oData = data.clone();
-	var i, x;
-	for(i=0;i<data.length;i++){
-		for(x=0;x<data[i].length;x++){
-			if (x!==0) data[i][x] = (data[i][x]/steps) *2;
+	var oD = d.clone();
+	var i,x,nDP,clear,opts;
+	for(i=0;i<d.length;i++){
+		for(x=0;x<d[i].length;x++){
+			if (x!==0) d[i][x] = (d[i][x]/steps)*2;
 		}
 	}
 	var interval = setInterval(function(){
-		//increase the data points.
-		for(i=0;i<data.length;i++){
-			for(x=0;x<data[i].length;x++){
+		//increase the d points.
+		for(i=0;i<d.length;i++){
+			for(x=0;x<d[i].length;x++){
 				if (x!==0){
-					newDataPoint = data[i][x] + (oData[i][x] / steps);
-					if (newDataPoint <= oData[i][x]) {
+					nDP = d[i][x]+(oD[i][x]/steps);
+					if (nDP <= oD[i][x]) {
 						//leave gaps.
-						if (newDataPoint===0) data[i][x] = null;
-						else data[i][x] = newDataPoint;
+						if (nDP===0) d[i][x] = null;
+						else d[i][x] = nDP;
 					}
 					else{
-						data[i][x] = oData[i][x];
-						setTimeout(function(){
-							clearInterval(interval);
-						}, 500); //clear up afterwards to free up performance and stop the hover glitching.
+						d[i][x] = oD[i][x];
+						clear = true;
 					}
 				}
 			}
 		}
+		if (clear) clearInterval(interval);
 		//set the options
-		var options = {'file': data};
+		opts = {'file': d};
 		if (first){
-			options.visibility = [true, true];
+			opts.visibility = [true, true];
 			first = false;
 		}
 		//render the chart again
-		dygraph.updateOptions(options);
+		dygraph.updateOptions(opts);
 	}, 1000 / fps);
 };
                  
