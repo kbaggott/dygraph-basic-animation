@@ -71,7 +71,12 @@ function animate(d, dygraph){
 				}
 			}
 		}
-		if (clear) clearInterval(interval);
+		if (clear){
+			//backup to ensure the correct data 
+			//is shown at the end if js is slow.
+			dygraph.updateOptions({'file':oD});
+			clearInterval(interval);
+		}
 		//set the options
 		opts = {'file': d};
 		if (first){
